@@ -31,6 +31,7 @@ Then add command parameter to the **ImagePath** setting.
 | /p= | Port Number of syslog listener | 514 | It is necessary to open inbound UDP access with firewall |
 | /w= | Workspace ID | | Copy it from Azure Log Analytics screen. See detail below. |
 | /k= | Key | | Copy from the same screen of Workspace ID |  
+| /t= | Transfer target | 192.168.1.2:50514 | Re-send syslog UDP packet to transfer target IP:Port (IPv4 only) |  
 
 #### To know Azure Monitor ID/Key  
 Open Log Analytics in Azure Portal of ARM (Azure Resource Manager) then select **[1.Advanced Settings]** - **[2.Connected Sources]** - **[3.Windows Servers]**  

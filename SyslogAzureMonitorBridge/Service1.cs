@@ -56,6 +56,7 @@ namespace SyslogAzureMonitorBridge
             listener = new SyslogListener
             {
                 PortNo = int.Parse(Params["/p"]),
+                TransferIPv4 = Params.GetValueOrDefault("/t"),
             };
             listener.OnMessage += Listener_OnMessage;
             listener.OnError += Listener_OnError;
@@ -117,6 +118,11 @@ namespace SyslogAzureMonitorBridge
                     return false;
                 }
             }
+            if (args.Where(a => a.StartsWith("/t=")).Select(a => a.Substring(3)).FirstOrDefault() is string tprm)
+            {
+                Params["/t"] = tprm;
+            }
+
             return true;
         }
 

@@ -17,6 +17,15 @@ namespace SyslogAzureMonitorBridge
         public int PortNo { get; set; }
 
         /// <summary>
+        /// Transfer IP:Port setting / null=no transfer
+        /// </summary>
+        public string TransferIPv4 { get; set; }
+
+        private IPEndPoint transep = null;
+        private int transport = -1;
+        private UdpClient tracli = null;
+
+        /// <summary>
         /// Listen UDP syslog message
         /// </summary>
         /// <param name="cancellationToken"></param>
@@ -43,6 +52,34 @@ namespace SyslogAzureMonitorBridge
                                     EventUtcTime = DateTime.UtcNow,
                                 });
                                 retry = 0;
+
+                                // Transfer to loopback 49515 for RtxLogSummaryServer
+                                if (TransferIPv4 != null && transport == -1)
+                                {
+                                    transport = 0;
+                                    var ipp = TransferIPv4.Split(':');
+                                    if( ipp.Length == 2)
+                                    {
+                                        var transip = IPAddress.Parse(ipp[0]);
+                                        transport = int.Parse(ipp[1]);
+                                        transep = new IPEndPoint(transip, transport);
+                                    }
+                                }
+                                if (transep != null)
+                                {
+                                    try
+                                    {
+                                        if( tracli == null)
+                                        {
+                                            tracli = new UdpClient();
+                                        }
+                                        tracli.Send(rcvBytes, rcvBytes.Length, transep);
+                                    }
+                                    catch (Exception)
+                                    {
+                                        tracli = null;
+                                    }
+                                }
                             }
                             catch (Exception ex)
                             {
